@@ -1,15 +1,21 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
-require 'eventorz'
 
 class TestHandler
-  attr_accessor :times_executed
+  attr_reader :events
+  attr_reader :collector
 
-  def myHandler
-    self.times_executed ||= 0
-    self.times_executed += 1
+  def initialize(collector = [])
+    @collector = collector
   end
 
+  def myHandler(source, parameters)
+    @events ||= []
+    @events << [source, parameters]
+    @collector << self
+  end
 end
+
+
 
 describe "Eventorz" do
 
@@ -17,8 +23,8 @@ describe "Eventorz" do
     @clazz=Class.new(Object) do
       event :event_name
 
-      define_method :fire_event do
-        on_event_name
+      define_method :fire_event do |message|
+        on_event_name :message => message
       end
     end
   end
@@ -47,16 +53,28 @@ describe "Eventorz" do
     end
   end
 
-  describe "can append event" do
-    it "with obj.event += handler" do
+  describe "can append event with obj.event += handler" do
+    
+    before :all do
       def test_handler
         puts "handling event"
       end
 
-      instance = @clazz.new
-      instance.event_name += handle(self, :test_handler)
-      instance.event_name.should contain_event_handler(self, :test_handler)
+      @instance = @clazz.new
     end
+    
+    it "specifying the target instance" do
+      @instance.event_name += handle(self, :test_handler)
+      
+      @instance.event_name.should contain_event_handler(self, :test_handler)
+    end
+    
+    it "without specifying the target instance" do
+      @instance.event_name += handle(:test_handler)
+      
+      @instance.event_name.should contain_event_handler(self, :test_handler)
+    end
+
   end
 
   describe "invokes handlers" do
@@ -65,9 +83,22 @@ describe "Eventorz" do
 
       instance = @clazz.new
       instance.event_name += handle(test_handler, :myHandler)
-      instance.fire_event
+      instance.fire_event :event
 
-      test_handler.times_executed.should == 1
+      test_handler.events.should eql( [[instance, {:message => :event}]] )
+    end
+    
+    it "in order" do
+      collector = []
+      test_handler_one = TestHandler.new collector
+      test_handler_two = TestHandler.new collector
+
+      instance = @clazz.new
+      instance.event_name += handle(test_handler_one, :myHandler)
+      instance.event_name += handle(test_handler_two, :myHandler)
+      instance.fire_event :event
+
+      collector.should eql( [ test_handler_one, test_handler_two ] )
     end
   end
 end

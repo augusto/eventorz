@@ -11,7 +11,7 @@ RSpec.configure do |config|
   
 end
 
-
+# Custom Matchers
 RSpec::Matchers.define :have_private_method do |method_name|
   match do |clazz|
     clazz.private_method_defined? method_name

@@ -7,9 +7,9 @@ module Eventorz
       handlers << handler
     end
 
-    def fire
+    def fire(source, parameters)
       @handlers.each do |handler|
-        handler.fire
+        handler.fire( source, parameters)
       end
     end
 
@@ -20,30 +20,32 @@ module Eventorz
   end
 
   class InvocationWrapper
-    def initialize(instance, method_name)
-      @instance = instance
+    def initialize(target, method_name)
+      @target = target
       @method_name = method_name
     end
 
-    def fire
-      @instance.send @method_name
+    def fire(source, parameters)
+      @target.send @method_name, source, parameters
     end
 
     def ==(other)
-      return false unless other.respond_to?(:instance) and other.respond_to?(:method_name)
-      self.instance == other.instance and self.method_name == other.method_name
+      return false unless other.respond_to?(:target) and other.respond_to?(:method_name)
+      self.target == other.target and self.method_name == other.method_name
     end
 
     protected
-    attr_accessor :instance, :method_name;
+    attr_accessor :target, :method_name;
 
     public 
     def to_s
-      "#{self.class}:instance=#{self.instance};method=#{self.method_name}"
+      "#{self.class}:target=#{self.target};method=#{self.method_name}"
     end
   end
 
 end
+
+
 
 class Module
   
@@ -53,9 +55,9 @@ class Module
     method_name = "on_#{event_name}"
     variable_name = "@event_#{event_name}"
 
-    define_method method_name do
+    define_method method_name do |parameters|
       event_handler = instance_variable_get(variable_name)
-      event_handler.fire
+      event_handler.fire( self, parameters)
     end
     
     define_method event_name do
@@ -75,10 +77,21 @@ class Module
   end
 end
 
-module Kernel
-  private
 
-  def handle( instance, method_name )
-    Eventorz::InvocationWrapper.new( instance, method_name);
+
+module Kernel
+  #
+  # Adds an event handler. The method can be invoked with an implicit target (defatuls to self)
+  #   object.event_name += handle :method_name
+  # or with an explicit target object
+  #   object.event_name += handle instance, :method_name
+  #
+  private
+  def handle( *args )
+    if args.length == 1 
+      Eventorz::InvocationWrapper.new self,    args[0]
+    elsif args.length == 2
+      Eventorz::InvocationWrapper.new args[0], args[1]
+    end
   end
 end
