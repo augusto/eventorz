@@ -9,6 +9,7 @@ module Eventorz
     def fire(source, parameters)
       @handlers.each do |handler|
         handler.fire( source, parameters)
+        nil
       end
     end
 
