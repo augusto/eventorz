@@ -17,8 +17,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "eventorz"
   gem.homepage = "http://github.com/augusto/eventorz"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{Event producer / consumer as in C#}
+  gem.description = %Q{Event producer / consumer as in C#}
   gem.email = "augusto.rodriguez@gmail.com"
   gem.authors = ["Augusto Rodriguez"]
   # dependencies defined in Gemfile
