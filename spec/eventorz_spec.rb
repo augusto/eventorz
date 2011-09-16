@@ -1,32 +1,13 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
-class TestHandler
-  attr_reader :events
-  attr_reader :collector
-
-  def initialize(collector = [])
-    @collector = collector
-  end
-
-  def myHandler(source, parameters)
-    @events ||= []
-    @events << [source, parameters]
-    @collector << self
-  end
-end
-
-
-
 describe "Eventorz" do
 
-  before :all do
-    @clazz=Class.new(Object) do
+  class TestSourceClass
       event :event_name
 
-      define_method :fire_event do |message|
+      def fire_event(message)
         on_event_name :message => message
       end
-    end
   end
 
   describe "require module" do
@@ -41,15 +22,15 @@ describe "Eventorz" do
 
   describe "event keyword" do
     it "adds method obj.event_name for obj.event += handler" do
-      @clazz.new.should respond_to(:event_name)
+      TestSourceClass.new.should respond_to(:event_name)
     end
 
     it "adds method obj.event_name= for obj.event += handler" do
-      @clazz.new.should respond_to(:event_name=)
+      TestSourceClass.new.should respond_to(:event_name=)
     end
 
     it "adds private method on_event_name" do
-      @clazz.should have_private_method(:on_event_name)
+      TestSourceClass.should have_private_method(:on_event_name)
     end
   end
 
@@ -60,7 +41,7 @@ describe "Eventorz" do
         puts "handling event"
       end
 
-      @instance = @clazz.new
+      @instance = TestSourceClass.new
     end
     
     it "specifying the target instance" do
@@ -78,10 +59,25 @@ describe "Eventorz" do
   end
 
   describe "invokes handlers" do
+    class TestHandler
+      attr_reader :events
+      attr_reader :collector
+    
+      def initialize(collector = [])
+        @collector = collector
+      end
+    
+      def myHandler(source, parameters)
+        @events ||= []
+        @events << [source, parameters]
+        @collector << self
+      end
+    end
+
     it "when calling on_event_name" do
       test_handler = TestHandler.new
 
-      instance = @clazz.new
+      instance = TestSourceClass.new
       instance.event_name += handle(test_handler, :myHandler)
       instance.fire_event :event
 
@@ -93,7 +89,7 @@ describe "Eventorz" do
       test_handler_one = TestHandler.new collector
       test_handler_two = TestHandler.new collector
 
-      instance = @clazz.new
+      instance = TestSourceClass.new
       instance.event_name += handle(test_handler_one, :myHandler)
       instance.event_name += handle(test_handler_two, :myHandler)
       instance.fire_event :event
