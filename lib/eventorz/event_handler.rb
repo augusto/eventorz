@@ -1,5 +1,5 @@
 module Eventorz
-  class EventHandler
+  class Event
   
     public
     def +(handler)

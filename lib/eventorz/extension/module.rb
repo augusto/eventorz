@@ -27,7 +27,7 @@ class Module
     define_method event_name do
       var = instance_variable_get(variable_name)
       unless var
-        var = Eventorz::EventHandler.new
+        var = Eventorz::Event.new
         instance_variable_set(variable_name, var)
       end
       var
