@@ -1,19 +1,15 @@
-= eventorz
+= Event0rz!
 
-Description goes here.
+A Ruby hack (or gem) to add events in a similar way as C#
 
-== Contributing to eventorz
- 
-* Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
-* Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it
-* Fork the project
-* Start a feature/bugfix branch
-* Commit and push until you are happy with your contribution
-* Make sure to add tests for it. This is important so I don't break it in a future version unintentionally.
-* Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.
+== Disclaimer
+
+This is a hack to learn a bit more about metaprogramming. If you find it useful, please use it and contact me if 
+you have any ideas about how to improve it.
+I still wish I would become millionare by selling this library a trillion times and do a hostile takeover of Apple,
+Google and Ben & Jerry, but it's just a wish.
+
 
 == Copyright
 
-Copyright (c) 2011 Augusto Rodriguez. See LICENSE.txt for
-further details.
-
+Only the letter 'e' is copyrighted, so feel free to use any code that doesn't contain any 'e'.
