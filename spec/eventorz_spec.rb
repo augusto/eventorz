@@ -14,6 +14,9 @@ describe "Eventorz" do
       Module.should have_private_method(:event)
     end
 
+    it "adds 'handle' keyword in Kernel to define handlers" do
+      Kernel.should have_private_method(:handle)
+    end
   end
 
   describe "event keyword" do
@@ -22,15 +25,20 @@ describe "Eventorz" do
     end
 
     it "adds private fire_event_name method" do
-      @clazz.should have_private_method(:fire_event_name)
+      @clazz.should have_private_method(:on_event_name)
     end
   end
 
   describe "can append event" do
     it "with obj.event += handler" do
+      def test_handler
+        puts "handling event"
+      end
+
       instance = @clazz.new
-      instance.event_name += handle
+      instance.event_name += handle(self, :test_handler)
+      instance.event_name.should contain_event_handler(self, :test_handler)
     end
   end
-  
+
 end
