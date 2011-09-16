@@ -7,6 +7,12 @@ module Eventorz
       handlers << handler
     end
 
+    def fire
+      @handlers.each do |handler|
+        handler.fire
+      end
+    end
+
     private
     def handlers
       @handlers ||= []
@@ -17,6 +23,10 @@ module Eventorz
     def initialize(instance, method_name)
       @instance = instance
       @method_name = method_name
+    end
+
+    def fire
+      @instance.send @method_name
     end
 
     def ==(other)
@@ -44,6 +54,8 @@ class Module
     variable_name = "@event_#{event_name}"
 
     define_method method_name do
+      event_handler = instance_variable_get(variable_name)
+      event_handler.fire
     end
     
     define_method event_name do

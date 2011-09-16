@@ -1,11 +1,25 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 require 'eventorz'
 
+class TestHandler
+  attr_accessor :times_executed
+
+  def myHandler
+    self.times_executed ||= 0
+    self.times_executed += 1
+  end
+
+end
+
 describe "Eventorz" do
 
   before :all do
     @clazz=Class.new(Object) do
       event :event_name
+
+      define_method :fire_event do
+        on_event_name
+      end
     end
   end
 
@@ -20,11 +34,15 @@ describe "Eventorz" do
   end
 
   describe "event keyword" do
-    it "adds obj.event_name reader" do
+    it "adds method obj.event_name for obj.event += handler" do
       @clazz.new.should respond_to(:event_name)
     end
 
-    it "adds private fire_event_name method" do
+    it "adds method obj.event_name= for obj.event += handler" do
+      @clazz.new.should respond_to(:event_name=)
+    end
+
+    it "adds private method on_event_name" do
       @clazz.should have_private_method(:on_event_name)
     end
   end
@@ -41,4 +59,15 @@ describe "Eventorz" do
     end
   end
 
+  describe "invokes handlers" do
+    it "when calling on_event_name" do
+      test_handler = TestHandler.new
+
+      instance = @clazz.new
+      instance.event_name += handle(test_handler, :myHandler)
+      instance.fire_event
+
+      test_handler.times_executed.should == 1
+    end
+  end
 end
