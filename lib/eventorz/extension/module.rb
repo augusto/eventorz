@@ -16,28 +16,25 @@ class Module
   #   EventProducer.new.my_event += handle(:handler_method)
   def event(event_name)
     method_name = "on_#{event_name}"
-    variable_name = "@event_#{event_name}"
+    internal_variable_name = "@event_#{event_name}"
 
+    # define method obj.on_event_name
     define_method method_name do |parameters|
-      event_handler = instance_variable_get(variable_name)
+      event_handler = instance_variable_get(internal_variable_name)
       event_handler.fire( self, parameters)
       nil
     end
     private method_name
-    
+
+    # define method obj.event_name
     define_method event_name do
-      var = instance_variable_get(variable_name)
-      unless var
-        var = Eventorz::Event.new
-        instance_variable_set(variable_name, var)
-      end
-      var
+      instance_variable_get(internal_variable_name) || Eventorz::Event.new
     end
 
-    define_method "#{event_name}=" do |event_handler|
-
+    # define method obj.event_name=
+    define_method "#{event_name}=" do |event|
+      instance_variable_set(internal_variable_name, event)
     end
 
-    private method_name.to_sym
   end
 end

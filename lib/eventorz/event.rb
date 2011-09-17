@@ -4,11 +4,13 @@ module Eventorz
     public
     def +(handler)
       handlers << handler
+      self
     end
 
     def -(handler)
       handlers.delete(handler)
       handlers.compact!
+      self
     end
 
     def fire(source, parameters)
