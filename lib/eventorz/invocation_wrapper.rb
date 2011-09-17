@@ -1,5 +1,5 @@
 module Eventorz
-  class InvocationWrapper
+  class EventHandler
     def initialize(target, method_name)
       @target = target
       @method_name = method_name

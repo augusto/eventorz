@@ -9,9 +9,9 @@ module Kernel
   private
   def handle( *args )
     if args.length == 1 
-      Eventorz::InvocationWrapper.new self,    args[0]
+      Eventorz::EventHandler.new self,    args[0]
     elsif args.length == 2
-      Eventorz::InvocationWrapper.new args[0], args[1]
+      Eventorz::EventHandler.new args[0], args[1]
     end
   end
 end
