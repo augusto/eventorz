@@ -18,8 +18,8 @@ describe "Eventorz" do
       Module.should have_private_method(:event)
     end
 
-    it "adds 'handle' keyword in Kernel to define handlers" do
-      Kernel.should have_private_method(:handle)
+    it "adds 'handler' keyword in Kernel to define handlers" do
+      Kernel.should have_private_method(:handler)
     end
   end
 
@@ -38,60 +38,60 @@ describe "Eventorz" do
   end
 
   it "can remove a handler with obj.event -= handler" do
-    instance = TestSourceClass.new
+    source = TestSourceClass.new
 
-    instance.event_name += handle(self, :test_handler)
-    instance.event_name.should contain_event_handler(self, :test_handler)
+    source.event_name += handler(self, :test_handler)
+    source.event_name.should contain_event_handler(self, :test_handler)
     
-    instance.event_name -= handle(self, :test_handler)
-    instance.event_name.send(:handlers).should be_empty
+    source.event_name -= handler(self, :test_handler)
+    source.event_name.send(:handlers).should be_empty
   end
 
   describe "can append event with obj.event += handler" do
     
     before :each do
-      @instance = TestSourceClass.new
+      @source = TestSourceClass.new
     end
     
     it "specifying the target instance" do
-      @instance.event_name += handle(self, :test_handler)
+      @source.event_name += handler(self, :test_handler)
       
-      @instance.event_name.should contain_event_handler(self, :test_handler)
+      @source.event_name.should contain_event_handler(self, :test_handler)
     end
     
     it "without specifying the target instance" do
-      @instance.event_name += handle(:test_handler)
+      @source.event_name += handler(:test_handler)
       
-      @instance.event_name.should contain_event_handler(self, :test_handler)
+      @source.event_name.should contain_event_handler(self, :test_handler)
     end
     
     it "with a lambda" do
       proc = lambda { |source, parameters| nil }
-      @instance.event_name += handle( proc )
+      @source.event_name += handler( proc )
       
-      @instance.event_name.should contain_proc_event_handler(proc)
+      @source.event_name.should contain_proc_event_handler(proc)
     end
     
     it "with a proc" do
       proc = Proc.new { |source, parameters| nil }
-      @instance.event_name += handle( proc )
+      @source.event_name += handler( proc )
       
-      @instance.event_name.should contain_proc_event_handler(proc)
+      @source.event_name.should contain_proc_event_handler(proc)
     end
 
     it "with a block" do
-      @instance.event_name.send(:handlers).size.should == 0 #precondition
+      @source.event_name.send(:handlers).size.should == 0 #precondition
       
-      @instance.event_name += handle { nil }
+      @source.event_name += handler { nil }
       
-      @instance.event_name.send(:handlers).size.should == 1
+      @source.event_name.send(:handlers).size.should == 1
     end
 
   end
   
   it "raises error if handler parameters are incorrect" do
     clazz = Class.new
-    lambda { clazz.send :handle, "string"}.should raise_exception(ArgumentError)
+    lambda { clazz.send :handler, "string"}.should raise_exception(ArgumentError)
   end
 
   describe "invokes handlers" do
@@ -113,11 +113,11 @@ describe "Eventorz" do
     it "when calling on_event_name" do
       test_handler = TestHandler.new
 
-      instance = TestSourceClass.new
-      instance.event_name += handle(test_handler, :myHandler)
-      instance.fire_event :event
+      source = TestSourceClass.new
+      source.event_name += handler(test_handler, :myHandler)
+      source.fire_event :event
 
-      test_handler.events.should eql( [[instance, {:message => :event}]] )
+      test_handler.events.should eql( [[source, {:message => :event}]] )
     end
 
     it "in order" do
@@ -125,10 +125,10 @@ describe "Eventorz" do
       test_handler_one = TestHandler.new collector
       test_handler_two = TestHandler.new collector
 
-      instance = TestSourceClass.new
-      instance.event_name += handle(test_handler_one, :myHandler)
-      instance.event_name += handle(test_handler_two, :myHandler)
-      instance.fire_event :event
+      source = TestSourceClass.new
+      source.event_name += handler(test_handler_one, :myHandler)
+      source.event_name += handler(test_handler_two, :myHandler)
+      source.fire_event :event
 
       collector.should eql( [ test_handler_one, test_handler_two ] )
     end
@@ -138,11 +138,11 @@ describe "Eventorz" do
       test_handler_one = TestHandler.new @collector
       test_handler_two = Proc.new { |source,params| @collector << "proc" }
 
-      instance = TestSourceClass.new
-      instance.event_name += handle(test_handler_one, :myHandler)
-      instance.event_name += handle(test_handler_two)
-      instance.event_name += handle { @collector << "block"}
-      instance.fire_event :event
+      source = TestSourceClass.new
+      source.event_name += handler(test_handler_one, :myHandler)
+      source.event_name += handler(test_handler_two)
+      source.event_name += handler { @collector << "block"}
+      source.fire_event :event
 
       @collector.should eql( [ test_handler_one, "proc" , "block"] )
     end
