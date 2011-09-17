@@ -14,9 +14,9 @@ module Kernel
     when (args.length == 1 and args[0].kind_of? Proc)
       Eventorz::ProcHandler.new args[0]
     when (args.length == 1 and args[0].kind_of? Symbol)
-      Eventorz::EventHandler.new self,    args[0]
+      Eventorz::MethodHandler.new self,    args[0]
     when (args.length == 2 and args[1].kind_of? Symbol)
-      Eventorz::EventHandler.new args[0], args[1]
+      Eventorz::MethodHandler.new args[0], args[1]
     else
       raise ArgumentError.new "usage: handle [:method | target, :method | &block | {block}]"
     end

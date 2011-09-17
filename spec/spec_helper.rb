@@ -41,7 +41,7 @@ end
 RSpec::Matchers.define :contain_event_handler do |instance, method_name|
   match do |event_handler|
     handlers = event_handler.instance_variable_get("@handlers");
-    handlers.include? Eventorz::EventHandler.new(instance, method_name)
+    handlers.include? Eventorz::MethodHandler.new(instance, method_name)
   end
 
   failure_message_for_should do |event_handler|
