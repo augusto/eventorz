@@ -7,6 +7,7 @@ module Eventorz
 
     def fire(source, parameters)
       @target.send @method_name, source, parameters
+      nil
     end
 
     def ==(other)

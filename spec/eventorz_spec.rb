@@ -3,7 +3,6 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 describe "Eventorz" do
 
   def test_handler
-    puts "handling event"
   end
 
   class TestSourceClass
