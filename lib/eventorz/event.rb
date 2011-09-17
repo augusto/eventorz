@@ -6,6 +6,11 @@ module Eventorz
       handlers << handler
     end
 
+    def -(handler)
+      handlers.delete(handler)
+      handlers.compact!
+    end
+
     def fire(source, parameters)
       @handlers.each do |handler|
         handler.fire( source, parameters)

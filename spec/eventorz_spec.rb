@@ -2,6 +2,10 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe "Eventorz" do
 
+  def test_handler
+    puts "handling event"
+  end
+
   class TestSourceClass
       event :event_name
 
@@ -34,13 +38,19 @@ describe "Eventorz" do
     end
   end
 
+  it "can remove a handler with obj.event -= handler" do
+    instance = TestSourceClass.new
+
+    instance.event_name += handle(self, :test_handler)
+    instance.event_name.should contain_event_handler(self, :test_handler)
+    
+    instance.event_name -= handle(self, :test_handler)
+    instance.event_name.send(:handlers).should be_empty
+  end
+
   describe "can append event with obj.event += handler" do
     
     before :each do
-      def test_handler
-        puts "handling event"
-      end
-
       @instance = TestSourceClass.new
     end
     
