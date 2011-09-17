@@ -7,11 +7,18 @@ module Kernel
   #   object.event_name += handle instance, :method_name
   #
   private
-  def handle( *args )
-    if args.length == 1 
+  def handle( *args, &block)
+    case
+    when (args.length == 0 and block_given?)
+      Eventorz::ProcHandler.new block
+    when (args.length == 1 and args[0].kind_of? Proc)
+      Eventorz::ProcHandler.new args[0]
+    when (args.length == 1 and args[0].kind_of? Symbol)
       Eventorz::EventHandler.new self,    args[0]
-    elsif args.length == 2
+    when (args.length == 2 and args[1].kind_of? Symbol)
       Eventorz::EventHandler.new args[0], args[1]
+    else
+      raise ArgumentError.new "usage: handle [:method | target, :method | &block | {block}]"
     end
   end
 end

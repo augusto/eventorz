@@ -36,7 +36,7 @@ describe "Eventorz" do
 
   describe "can append event with obj.event += handler" do
     
-    before :all do
+    before :each do
       def test_handler
         puts "handling event"
       end
@@ -55,7 +55,34 @@ describe "Eventorz" do
       
       @instance.event_name.should contain_event_handler(self, :test_handler)
     end
+    
+    it "with a lambda" do
+      proc = lambda { |source, parameters| nil }
+      @instance.event_name += handle( proc )
+      
+      @instance.event_name.should contain_proc_event_handler(proc)
+    end
+    
+    it "with a proc" do
+      proc = Proc.new { |source, parameters| nil }
+      @instance.event_name += handle( proc )
+      
+      @instance.event_name.should contain_proc_event_handler(proc)
+    end
 
+    it "with a block" do
+      @instance.event_name.send(:handlers).size.should == 0 #precondition
+      
+      @instance.event_name += handle { nil }
+      
+      @instance.event_name.send(:handlers).size.should == 1
+    end
+
+  end
+  
+  it "raises error if handler parameters are incorrect" do
+    clazz = Class.new
+    lambda { clazz.send :handle, "string"}.should raise_exception(ArgumentError)
   end
 
   describe "invokes handlers" do
@@ -83,7 +110,7 @@ describe "Eventorz" do
 
       test_handler.events.should eql( [[instance, {:message => :event}]] )
     end
-    
+
     it "in order" do
       collector = []
       test_handler_one = TestHandler.new collector
@@ -95,6 +122,20 @@ describe "Eventorz" do
       instance.fire_event :event
 
       collector.should eql( [ test_handler_one, test_handler_two ] )
+    end
+    
+    it "in order (even proc, block and method handlers)" do
+      @collector = []
+      test_handler_one = TestHandler.new @collector
+      test_handler_two = Proc.new { |source,params| @collector << "proc" }
+
+      instance = TestSourceClass.new
+      instance.event_name += handle(test_handler_one, :myHandler)
+      instance.event_name += handle(test_handler_two)
+      instance.event_name += handle { @collector << "block"}
+      instance.fire_event :event
+
+      @collector.should eql( [ test_handler_one, "proc" , "block"] )
     end
   end
 end
