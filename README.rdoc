@@ -45,6 +45,10 @@ then from your code
   consumer = EventConsumer.new producer
   producer.do_something
 
+this code will produce the ouput
+
+  received event from #<EventProducer:0x000000101cc270> with parameters {:param=>"some param", :param2=>5}
+
 == Other handlers
 The <tt>handle</tt> method also supports procs and blocks so you can wire a handler in the following ways
 
