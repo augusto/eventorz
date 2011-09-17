@@ -60,7 +60,7 @@ The <tt>handle</tt> method also supports procs and blocks so you can wire a hand
   end
 
   mw = MoreWiring.new
-  mv.hook_handlers producer
+  mw.hook_handlers producer
   producer.do_something
   
 this code produces the output (it also fires the handler defined above in EventCosumer)
