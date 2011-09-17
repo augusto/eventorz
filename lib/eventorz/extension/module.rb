@@ -21,6 +21,7 @@ class Module
     define_method method_name do |parameters|
       event_handler = instance_variable_get(variable_name)
       event_handler.fire( self, parameters)
+      nil
     end
     private method_name
     

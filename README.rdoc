@@ -10,7 +10,7 @@ you have any ideas about how to improve it.
 I still wish I would become millionare by selling this library a trillion times and do a hostile takeover of Apple,
 Google and Ben & Jerry, but it's just a wish.
 
-== How to use
+== Crash introduction
 Download the latest code by running (I might upload to gemcutter at some point)
 
   git clone git@github.com:augusto/eventorz.git
@@ -25,7 +25,8 @@ then from your code
   class EventProducer
     event :my_event
 
-    def fire_event
+    def do_something
+      # do some serious business and then fire event
       on_my_event :param => 'some param', :param2 => 5
     end
   end
@@ -42,7 +43,26 @@ then from your code
 
   producer = EventProducer.new
   consumer = EventConsumer.new producer
-  producer.fire_event
+  producer.do_something
+
+== Other handlers
+The <tt>handle</tt> method also supports procs and blocks so you can wire a handler in the following ways
+
+  class MoreWiring
+    def hook_handlers(producer)
+      producer.my_event += handle { |source, params| puts "I've received #{params} from #{source}" }
+      producer.my_event += handle lambda { |source, params| puts "this is a lambda handler" }
+    end
+  end
+
+  mw = MoreWiring.new
+  producer.do_something
+  
+this code produces the output (it also fires the handler defined above in EventCosumer)
+
+  received event from #<EventProducer:0x000000101cc270> with parameters {:param=>"some param", :param2=>5}
+  I've received {:param=>"some param", :param2=>5} from #<EventProducer:0x000000101cc270>
+  this is a lambda handler
 
 == Copyright
 
